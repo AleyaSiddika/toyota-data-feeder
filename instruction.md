@@ -83,30 +83,36 @@ oc tag toyota_data_feeder:1.0 rahti.csc.fi/csc_project/toyota_data_feeder:1.0
 oc import-image csc_project/toyota_data_feeder:1.0 --from=toyota_data_feeder:1.0 --confirm
 ```
 
----
-
-## or,
-
-**Login to Rahti Registry:**
-
-**Build Docker Image:**
+**Run Docker Compose to Start Up the Services:**
 
 ```bash
-oc build -t rahti.csc.fi/csc_project/toyota_data_feeder:1.0 .
+docker-compose up
 ```
 
-**Tag the Docker Image:**
+- `-d`: Run the containers in the background (detached mode).
 
-Tag the Docker image with the Rahti Registry URL:
+**Confirm You Are Receiving Messages to Your Localhost with `mosquitto_sub`:**
 
 ```bash
-oc tag rahti.csc.fi/csc_project/toyota_data_feeder:1.0 rahti.csc.fi/csc_project/toyota_data_feeder:1.0
+mosquitto_sub -h localhost -p 1883 -t "#" -v
 ```
 
-**Push the Docker Image to Rahti Registry:**
+- This command subscribes to all topics (`"#"`), and the `-v` option displays the received messages.
 
-Push the Docker image to the Rahti Registry:
+**Showcase That Your Containers Work in a Custom Network:**
+
+- You can showcase this by running a simple test within one of the containers. For example, if you have shell access to the `toyota-data-feeder` container:
 
 ```bash
-oc push rahti.csc.fi/csc_project/toyota_data_feeder:1.0
+docker exec -it container_id sh
 ```
+
+Within the container, you can perform some actions to confirm connectivity to the Mosquitto broker, such as using `ping`, `telnet`, or testing the connection with the application.
+
+**`docker network inspect` to Verify the Custom Network:**
+
+```bash
+docker network inspect student2307277-net
+```
+
+- Replace `student2307277-net` with your actual network name.
