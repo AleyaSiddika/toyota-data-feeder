@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodered
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodered
+  template:
+    metadata:
+      labels:
+        app: nodered
+    spec:
+      containers:
+        - name: nodered
+          image: nodered/node-red:3.0.0
+          ports:
+            - containerPort: 1880
+          volumeMounts:
+            - name: nodered-data
+              mountPath: /data
+      volumes:
+        - name: nodered-data
+          persistentVolumeClaim:
+            claimName: nodered-data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodered
+spec:
+  ports:
+    - port: 1880
+      targetPort: 1880
+  type: LoadBalancer
+  selector:
+    app: nodered
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: nodered-route
+spec:
+  host: nodered.2307277.rahtiapp.fi
+  to:
+    kind: Service
+    name: nodered

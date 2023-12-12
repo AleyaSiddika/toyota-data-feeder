@@ -104,7 +104,7 @@ mosquitto_sub -h localhost -p 1883 -t "#" -v
 - You can showcase this by running a simple test within one of the containers. For example, if you have shell access to the `toyota-data-feeder` container:
 
 ```bash
-docker exec -it container_id sh
+docker exec -it container_id /bin/bash
 ```
 
 Within the container, you can perform some actions to confirm connectivity to the Mosquitto broker, such as using `ping`, `telnet`, or testing the connection with the application.
@@ -116,3 +116,45 @@ docker network inspect student2307277-net
 ```
 
 - Replace `student2307277-net` with your actual network name.
+
+**Deploying mosquitto broker to Rahti cloud: (Take screenshots)**
+
+```bash
+oc delete –all service
+oc create -f mosquitto-deployment.yaml
+```
+
+**To update an existing resource:**
+
+```bash
+oc apply -f mosquitto-deployment.yaml
+oc create --save-config -f mosquitto-deployment.yaml
+
+```
+
+**Inspect your deployment: (Take screenshots)**
+
+```bash
+oc get all
+```
+
+**"ls mosquitto/config/certs" and "cat mosquitto/config/mosquitto.conf" (Take screenshots)**
+
+```bash
+oc get pod
+oc exec <podname> -i -t -- sh
+
+ls mosquitto/config/certs
+cat mosquitto/config/mosquitto.conf
+
+```
+
+```bash
+oc create -f nodered-pvc.yaml
+oc create -f nodered-deployment.yaml
+
+oc replace –force -f nodered-deployment.yaml
+
+docker run -e MQTT_URL=mqtt.student2307277.rahtiapp.fi -e MQTT_PORT=443 -e CLIENT_ID=asiddika aleyasiddika/toyota_data_feeder:1.0
+
+```

@@ -11,4 +11,3 @@ __pycache__
 *.swp
 .DS_Store
 /assets
-ca.crt

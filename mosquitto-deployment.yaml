@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec:
+      containers:
+        - name: mosquitto
+          image: eclipse-mosquitto:latest
+          ports:
+            - containerPort: 1883
+            - containerPort: 8883
+          volumeMounts:
+            - name: mosquitto-conf
+              mountPath: /mosquitto/config/mosquitto.conf
+              subPath: mosquitto.conf
+            - name: mosquitto-certs
+              mountPath: /mosquitto/config/certs
+      volumes:
+        - name: mosquitto-conf
+          configMap:
+            name: mosquitto-conf
+        - name: mosquitto-certs
+          configMap:
+            name: mosquitto-certs
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-conf
+data:
+  mosquitto.conf: |
+    allow_anonymous true
+    listener 1883
+    listener 8883
+    certfile /mosquitto/config/certs/server.crt
+    keyfile /mosquitto/config/certs/server.key
+    cafile /mosquitto/config/certs/ca.crt
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-certs
+data:
+  server.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIICwjCCAaoCFAJe4ExOJyuLsqiK4ocRNcWW4zJuMA0GCSqGSIb3DQEBCwUAMB0x
+    DTALBgNVBAoMBGFjbWUxDDAKBgNVBAMMA2NvbTAeFw0yMjAzMTQxNzAwMDhaFw0z
+    MjAzMTExNzAwMDhaMB4xDjAMBgNVBAoMBWFjbWUyMQwwCgYDVQQDDANjb20wggEi
+    MA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDevN1a9n7TCrXxhDhN+wFnXARf
+    ok5AtkHec4V8edO1bM1Q7QXArPfLejYfzLyLvocnw2ThMyL0JcqYIORVWXVjruhk
+    MNOPbT9xYpL5yj+778iStxrGG55QslHA6TAYTONXTGzGMuWiPpZTWzI0boiSr4n9
+    0UuTVZpdogj50sTwgBkcmKE/CvmiZfdZZx6Oyuy+BpgCpvzxunp93l1lejSV5+go
+    nBD+yETet2jY/Jr/Lo+LC1+3QHOb8Sfl7/kW764LRp5rh4CZEuS51+TOPsvadaol
+    1l1PTpv97eBhrDwobHDkBWe3Qp+7MIJRNozS98D/b5e/XW/YlG66X/pUunmxAgMB
+    AAEwDQYJKoZIhvcNAQELBQADggEBAAOyA1+s25GN+YtvL7qkfe2YnxDzr/ADX/NK
+    EiEEeaVXgBvwMVAIf5DhbAhMAgJmi6hmt2x1jxxSqdrN9AjNsdznnIpsvV6R3msX
+    hreN0scazhzqZo7UNMLNZ2I9sHJtS4N3x5Z9Pcb8Ph8pYKpR2qH6XrBtmWBhmBgl
+    SQ3sMdYN4EaHBaGcL487t0ZsdBqFeWjgp0CVUmyDiLEV4sI3Il3ScRaRP3DDTAmy
+    OFrCaC44wcy35szNBQRbZ1hfvz8TL+nBANlKWDBHKy5X4Uj4IahPLwYb1umzwv3Y
+    oUPbxUJAJk7CJoZd2DXx7l44pWI4wwHVshV0+KglkYJf0oCa8oE=
+    -----END CERTIFICATE-----
+
+  server.key: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpQIBAAKCAQEA3rzdWvZ+0wq18YQ4TfsBZ1wEX6JOQLZB3nOFfHnTtWzNUO0F
+    wKz3y3o2H8y8i76HJ8Nk4TMi9CXKmCDkVVl1Y67oZDDTj20/cWKS+co/u+/Ikrca
+    xhueULJRwOkwGEzjV0xsxjLloj6WU1syNG6Ikq+J/dFLk1WaXaII+dLE8IAZHJih
+    Pwr5omX3WWcejsrsvgaYAqb88bp6fd5dZXo0lefoKJwQ/shE3rdo2Pya/y6Piwtf
+    t0Bzm/En5e/5Fu+uC0aea4eAmRLkudfkzj7L2nWqJdZdT06b/e3gYaw8KGxw5AVn
+    t0KfuzCCUTaM0vfA/2+Xv11v2JRuul/6VLp5sQIDAQABAoIBAQCSNBJwROCWkq8+
+    6vUyapJPUB0m0RjgbUHrTJTQUf9fVR2oAw0FngPBMmUYloEkkVmSBjXPhItrCuti
+    1CRMyb2+Qu8T5ODZgnJkcLnc8J7JM+nKNBqE81gFzCbRo78IFGAdy3KS3pHQ35g4
+    +uGHfQ50injffGRJP6Vl1Jhjs6/F1HYpJb/tnyEBIDIF+yghTWCqXgP8JcI9W41y
+    LxjrxQzUpRJQ0tstKnuWtkQaUUGzBEdMuhwUR8knP2OzLvyskbJXrDx1BoJXSUBE
+    9YQIqrK3If4hk0eQS3sVhlE9W0pKzj2xyjoHxKfHtkQ+9y+ooBMg7genRKpSAV28
+    vjfYZbdpAoGBAPBwnph8FTg+ao5eafnkDw8923l3YOPYmW6lvigbWkxfE1EsHtit
+    4B2xK4SwU5TFZ+atPq6E/C+IM1D+WWa5vIAIAd70paVDwSzRxm45khKxnNIzDldk
+    aBoXWZ1QrG/kzhhJLRWE6CbixzS3W3G/YakVSuXbJp+wj6iu4i8/sBfHAoGBAO0m
+    +PHanWc4MwuJbMV41/dOQmK3urMXZ4+Qr9KtJj9Nij6E9lvFnq1y+L32PD1v+lMF
+    8tJFCXMbjtU2Dc6IAloyXH3aY5qrxA009NU/hgKAKvKotPMIGgjsP4DaAkOCeETG
+    pRJ5M6+m3/11ITRtywjypXiTXKn1dfmaiq39dBLHAoGBAIDucy0jhKF3Xt5fJIb6
+    01SCABnfeRZVBNm/iPuqxz4i0ZH6jcP1YTOq2MI7Z2ZkgPXCutUMvMqkR5hL/BbI
+    zJr/MDmliNnZPlJRXw2mU30wvv48oJkeX3B2Svi/1OffkuCVBNcAQRjxDI9pL2EM
+    lkr7/wDJBqolHLQAq4tYpI3rAoGBAJkXlo9ypDgVBIbHEUutRiWlBJ/7oW+phTYd
+    nhMvqcglwz+2z97QhS3NUZw30A2NMxjTdzycSoxfVuZ2vZT9Ih+d8S1hhPk9NxOb
+    gw4Csvz8Rj1eAWn+aegmspv4oIt6Ny+W2MtDKMWUwXY6XdQdqHs/QOjEoIYrKhyW
+    0j2dp4fTAoGAc+T49BqzalOMVPKb8FAfFNYR5A1eS/ykQHCxMOFwN2eMZntmf0Fy
+    c6zOu8e16aHi8/E2aFzg3/I/SAuZv7FPrHB51mnskn1oOqW8V7MANvWy6VO1yuz5
+    4HYY1/wV/zmd0x9ugb+5bLMt2zrbpU1Ybvhu7Eagw67rRJI0tZGc2SE=
+    -----END RSA PRIVATE KEY-----
+
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDGzCCAgOgAwIBAgIUause7hT+YXnEKw1yl8ueNSjrnVUwDQYJKoZIhvcNAQEL
+    BQAwHTENMAsGA1UECgwEYWNtZTEMMAoGA1UEAwwDY29tMB4XDTIyMDMxNDE2NTkw
+    M1oXDTMyMDMxMTE2NTkwM1owHTENMAsGA1UECgwEYWNtZTEMMAoGA1UEAwwDY29t
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxzQvFUrpHJnHiX2GPvxi
+    WtvvW5w2Ffx9++e4BGmIm4lvhAmC36VbYA1PtIZr23fO2IQg6rQugCLCf+pRQbJb
+    MCShuLUiH3J3x4gHFsrqr8eFuv8eCZT8+tVlHQKMzu/heiA3PXiwDpv5QUNBH9PP
+    O6G5MK/1lNeu3vI+4cXKc4aLvLE5hSVp7rU2Sb40h5dI3yGHWtWhvGtSkJXfOuZF
+    3oHH7UU5lFnQmuTeE9l7J+5wUs2SRFSlNyoLJ8z7lCzXcJ4qg0b6J2SSeUhfc3n8
+    nWkuCxNUMGispcU/QVtfTuhK1iSsPfJ+S8PrA4rFFRWMgUFvKznfjbzappYv3UtL
+    uwIDAQABo1MwUTAdBgNVHQ4EFgQUf1Wx+nT2ZEwYyK+YXKrsT4a8JbQwHwYDVR0j
+    BBgwFoAUf1Wx+nT2ZEwYyK+YXKrsT4a8JbQwDwYDVR0TAQH/BAUwAwEB/zANBgkq
+    hkiG9w0BAQsFAAOCAQEAlYUAo2A9UdVYenoFJL/e73yJfPoEax476+zYjlX0yykX
+    qeXEKnFHJIPIYmyzB/eAJF8u5U2bd0CYX2qDhsdM358BWc53o6Ie/KygcDup7yms
+    AJ3IGBBDHrR6iRFbG43GsPhztF6gOmAj4tYM86MIVcX7+cdTgvFUvgs8UxZ5uAEh
+    J9Nf3RXpdvSjQmFO+FoLqGY6UuTUnznjZrVb6QwE2e4Cj6s4S/vPagVnBJEroX4E
+    aGzbeSyIECiYGpT/8+ZCwVzK81fydKgTZUdrMuJ8zCfejTzS5jYZkqxCifCY0FM8
+    NgNSlg1GVYhSQ4+QT1uzIRz5NaCuTibRqGBYju7Ufg==
+    -----END CERTIFICATE-----
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosquitto
+spec:
+  selector:
+    app: mosquitto
+  ports:
+    - name: mqtt
+      protocol: TCP
+      port: 1883
+      targetPort: 1883
+    - name: mqtt-ssl
+      protocol: TCP
+      port: 8883
+      targetPort: 8883
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: mosquitto-route
+spec:
+  host: mqtt.student2307277.rahtiapp.fi
+  to:
+    kind: Service
+    name: mosquitto
+  tls:
+    termination: passthrough

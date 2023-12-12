@@ -3,6 +3,7 @@ version: "3.9"
 services:
   toyota-data-feeder:
     image: aleyasiddika/toyota_data_feeder:1.0
+    container_name: toyota-data-feeder
     environment:
       - MQTT_URL=mosquitto
       - MQTT_PORT=8883
@@ -26,6 +27,4 @@ services:
 
 networks:
   student2307277-net:
-    name: student2307277-net
     driver: bridge
-    
